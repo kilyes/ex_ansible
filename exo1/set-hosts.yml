@@ -1,0 +1,26 @@
+---
+- name: create /etc/my_hosts file
+  hosts: all
+  tasks:
+  - name: delete file
+    file:
+      path: /etc/my_hosts
+      state: absent
+  - name: delete file
+    file:
+      path: /etc/my_hosts.jinja
+      state: absent
+  - name: create file mu_hosts
+    lineinfile:
+      dest: /etc/my_hosts
+      line: '{{ hostvars[item].ansible_default_ipv4.address }} {{ hostvars[item].ansible_hostname }} {{item}}'
+      state: present
+      create: true
+    with_items: '{{ groups["web"] }}'
+    when: inventory_hostname in groups['lb']
+  - name: create with jinja
+    template:
+      src: hosts.j2
+      dest: /etc/my_hosts.jinja
+    with_items: '{{ groups["web"] }}'
+    when: inventory_hostname in groups['lb']
