@@ -1,0 +1,15 @@
+[student@serverc ~]$ cat /etc/my_hosts
+172.25.250.11 serverb serverb.lab.example.com
+172.25.250.10 servera servera.lab.example.com
+[student@serverc ~]$ 
+[student@serverc ~]$ 
+[student@serverc ~]$ 
+[student@serverc ~]$ 
+[student@serverc ~]$ 
+[student@serverc ~]$ cat /etc/my_hosts.jinja 
+# Ansible managed
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+
+172.25.250.11 serverb  serverb.lab.example.com
+172.25.250.10 servera  servera.lab.example.com
