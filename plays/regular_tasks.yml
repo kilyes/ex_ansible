@@ -1,0 +1,13 @@
+---
+- name: cronjob
+  hosts: proxy
+  tasks:
+  - name: cronjob
+    cron:
+      name: date
+      hour: "*"
+      minute: "00"
+      user: root
+      cron_file: date
+      job: "date >> /var/log/time.log"
+      state: present

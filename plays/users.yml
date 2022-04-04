@@ -1,0 +1,55 @@
+---
+- name: create users
+  hosts: webservers,database
+  vars_files:
+  - secret.yml
+  - user_list.yml
+  tasks:
+  - debug:
+      msg: "{{ item.uid |string | regex_search('^1') }}"
+    loop: "{{users}}"
+  - name: create users webserver
+    user:
+      name: "{{item.username}}"
+      uid:  "{{item.uid}}"
+      shell: /bin/bash
+      password: "{{user_password | password_hash('sha256')}}"
+      append: yes
+      groups: wheel
+    loop: "{{ users }}"
+    when: 
+    - inventory_hostname in groups.webservers
+    - item.uid | string | regex_search('^1') 
+
+  - name: create users DB
+    user:
+      name: "{{item.username}}"
+      uid:  "{{item.uid}}"
+      shell: /bin/bash
+      password: "{{database_password | password_hash('sha256')}}"
+      append: yes
+      groups: wheel
+    loop: "{{ users }}"
+    when:
+    - inventory_hostname in groups.database
+    - item.uid | string| regex_search('^2') 
+
+  - name: copy key db
+    authorized_key:
+      user: "{{item.username}}" 
+      state: present 
+      key: "{{lookup('file', '/home/automation/.ssh/id_rsa.pub')}}"
+    loop: "{{users}}"
+    when:
+    - inventory_hostname in groups.database
+    - item.uid | string| regex_search('^2')
+
+  - name: copy key webservers
+    authorized_key:
+      user: "{{item.username}}" 
+      state: present 
+      key: "{{lookup('file', '/home/automation/.ssh/id_rsa.pub')}}"
+    loop: "{{users}}"
+    when:
+    - inventory_hostname in groups.webservers
+    - item.uid | string| regex_search('^1')

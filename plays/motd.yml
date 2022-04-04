@@ -1,0 +1,20 @@
+---
+- name: Message of the day
+  hosts: all
+  become: yes
+  tasks:
+  - name: motd HPA
+    copy:
+      content: "Welcome HPA server"
+      dest: /etc/motd
+    when: inventory_hostname in groups.proxy
+  - name: motd DBA
+    copy:
+      content: "Welcome DATABASE server"
+      dest: /etc/motd
+    when: inventory_hostname in groups.database
+  - name: motd webservers
+    copy:
+      content: "Welcome webservers"
+      dest: /etc/motd
+    when: inventory_hostname in groups.webservers

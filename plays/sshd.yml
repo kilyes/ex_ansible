@@ -1,0 +1,23 @@
+---
+- name: Sshd configuration
+  hosts: all
+  tasks:
+  - name: Ssh configuration X11Forwarding
+    lineinfile:
+      path: /etc/ssh/sshd_config
+      regex: "^X11Forwarding"
+      line: "X11Forwarding no"
+  - name: Ssh configuration MaxAuthTries
+    lineinfile:
+      path: /etc/ssh/sshd_config
+      regex: "MaxAuthTries"
+      line: "MaxAuthTries 3"
+  - name: Ssh configuration Banner
+    lineinfile:
+      path: /etc/ssh/sshd_config
+      regex: "Banner"
+      line: "Banner /etc/motd"
+  - name: Restart sshd
+    service:
+      name: sshd
+      state: restarted

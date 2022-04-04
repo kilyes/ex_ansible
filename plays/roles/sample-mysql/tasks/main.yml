@@ -1,0 +1,70 @@
+---
+# tasks file for sample-mysql
+- name: create partition
+  parted:
+    device: /dev/vdb
+    number: 1
+    flags: [ lvm ]
+    state: present
+    part_end: 800MiB
+
+- name: Create vg
+  lvg:
+    vg: vg_database
+    pvs: /dev/vdb1
+
+- name: create lv
+  lvol:
+    vg: vg_database
+    lv: lv_mysql
+    size: 512m
+
+- name: fs xfs
+  filesystem:
+    fstype: xfs
+    dev: /dev/mapper/vg_database-lv_mysql
+
+- name: create directory
+  file:
+    path: /mnt/mysql_backups
+    state: directory
+
+- name: mount fs
+  mount:
+    path: /mnt/mysql_backups
+    src: /dev/mapper/vg_database-lv_mysql
+    state: mounted
+    fstype: xfs
+    fstab: /etc/fstab
+
+- name: install mysql
+  yum:
+    name: mysql-community-server
+    state: present
+
+- name: firewall
+  firewalld:
+    port: 3306/tcp
+    permanent: yes
+    immediate: yes
+    state: present
+
+- name: create mysql
+  mysql_user:
+    login_user: root
+    login_password: "{{database_password}}"
+    state: present
+
+- name: restart service mysql
+  service:
+    name: mysqld
+    state: restarted
+    enabled: yes
+
+- name: configure mysql
+  template:
+    src: my.cnf.j2
+    dest: /etc/mysql/my.cnf
+  notify: restart mysqld
+
+

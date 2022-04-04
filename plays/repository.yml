@@ -1,0 +1,16 @@
+---
+- name: Configure yum
+  hosts: database
+  tasks:
+  - name: install key
+    rpm_key:
+      key: http://repo.mysql.com/RPM-GPG-KEY-mysql
+      state: present
+  - name: install repo
+    yum_repository:
+      name: mysql80-community
+      description: “MySQL 8.0 YUM Repo” 
+      file: mysql80-community
+      baseurl: http://repo.mysql.com/yum/mysql-8.0-community/el/8/x86_64/
+      gpgcheck: yes
+      enabled: yes
