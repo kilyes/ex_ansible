@@ -1,0 +1,5 @@
+- name: install webservers
+  hosts: webservers
+  become: yes
+  roles:
+  - sample-apache

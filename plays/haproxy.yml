@@ -1,0 +1,11 @@
+---
+- name: haproxy
+  hosts: proxy
+  become: yes
+  pre_tasks:
+  - name: install haproxy packages
+    yum:
+      name: haproxy
+      state: latest
+  roles:
+  - geerlingguy.haproxy 

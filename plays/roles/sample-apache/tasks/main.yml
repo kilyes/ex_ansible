@@ -1,0 +1,34 @@
+---
+# tasks file for sample-apache
+- name: Install packages
+  yum:
+    name:
+    - mod_ssl
+    - httpd
+    - php
+    state: latest
+- name: httpd started
+  service:
+    name: httpd
+    enabled: yes
+    state: started
+- name: enable http and httpds
+  firewalld:
+    service: "{{item}}"
+    state: enabled
+    immediate: yes
+    permanent: yes
+  loop:
+  - http
+  - https
+- name: index.html
+  template:
+    src: index.html.j2
+    dest: /var/www/html/index.html
+  register: index_file
+
+- name: restart httpd
+  service:
+    name: httpd
+    state: restarted
+  when: index_file.changed
